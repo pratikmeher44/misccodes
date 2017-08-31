@@ -1,7 +1,6 @@
 #include <unordered_map>
-#include "misc/utils.h"
-
-namespace firmament {
+//#include "misc/utils.h"
+// need to include the required headers
 
 template <class KeyType, class ItemsType>
 struct KeyItems {
@@ -12,19 +11,19 @@ public:
 };
 
 template <class Type1, class Type2>
-class FirmamentSchedulerServiceQueue {
+class WorkQueue {
 
 public:
-FirmamentSchedulerServiceQueue() : shuttingDown(false) {
+WorkQueue() : shuttingDown(false) {
 }
 
-~FirmamentSchedulerServiceQueue() {
+~WorkQueue() {
 }
 
 // Add function
 void Add(Type1 key, Type2 item)
 {
-  boost::lock_guard<boost::recursive_mutex> lock_add(firmament_service_queue_lock_);
+  boost::lock_guard<boost::recursive_mutex> lock_add(work_queue_lock_);
   if(shuttingDown)
     return;
   if (processing.find(key) != processing.end()) {
@@ -39,7 +38,7 @@ void Add(Type1 key, Type2 item)
       // New key in the queue. Send signal.
       key_queue.push_back(key);
       // Notify any other threads waiting to execute processes
-      firmament_service_cond_var_.notify_one();
+      cond_var_.notify_one();
     }
   }
 }
@@ -47,9 +46,9 @@ void Add(Type1 key, Type2 item)
 // Get function
 struct KeyItems<Type1, Type2>& Get()
 {
-  boost::lock_guard<boost::recursive_mutex> lock(firmament_service_queue_lock_);
+  boost::lock_guard<boost::recursive_mutex> lock(work_queue_lock_);
   while((key_queue.size() == 0) && !shuttingDown) {
-    firmament_service_cond_var_.wait(firmament_service_queue_lock_);
+    cond_var_.wait(work_queue_lock_);
   }
   if(key_queue.size() == 0) {
     // We must be shutting down.
@@ -75,7 +74,7 @@ struct KeyItems<Type1, Type2>& Get()
 // Done function
 void Done(Type1 key)
 {
-  boost::lock_guard<boost::recursive_mutex> lock(firmament_service_queue_lock_);
+  boost::lock_guard<boost::recursive_mutex> lock(work_queue_lock_);
   processing.erase(key);
   auto key_items = toQueue.equal_range(key);
   if(key_items.first != key_items.second) {
@@ -84,22 +83,22 @@ void Done(Type1 key)
       items.insert(pair<Type1, Type2>(key, it->second));
     }
     toQueue.erase(key);
-    firmament_service_cond_var_.notify_one();
+    cond_var_.notify_one();
   }
 }
 
 // ShutDown function
 void ShutDown()
 {
-  boost::lock_guard<boost::recursive_mutex> lock(firmament_service_queue_lock_);
+  boost::lock_guard<boost::recursive_mutex> lock(work_queue_lock_);
   shuttingDown = true;
-  firmament_service_cond_var_.notify_all();
+  cond_var_.notify_all();
 }
 
 // ShuttingDown
 bool ShuttingDown()
 {
-  boost::lock_guard<boost::recursive_mutex> lock(firmament_service_queue_lock_);
+  boost::lock_guard<boost::recursive_mutex> lock(work_queue_lock_);
   return shuttingDown;
 }
 
@@ -122,8 +121,8 @@ void print_queue() {
 }
 
 private:
-  boost::recursive_mutex firmament_service_queue_lock_;
-  boost::condition_variable_any firmament_service_cond_var_;
+  boost::recursive_mutex work_queue_lock_;
+  boost::condition_variable_any cond_var_;
   vector<Type1> key_queue;
   unordered_set<Type1> processing;
   bool shuttingDown;
@@ -132,4 +131,3 @@ private:
   struct KeyItems<Type1, Type2> get_key_items;
 };
 
-} // namespace firmament
