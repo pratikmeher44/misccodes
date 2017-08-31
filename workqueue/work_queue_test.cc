@@ -1,37 +1,15 @@
-/*
- * Firmament
- * Copyright (c) The Firmament Authors.
- * All rights reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR
- * CONDITIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT
- * LIMITATION ANY IMPLIED WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR
- * A PARTICULAR PURPOSE, MERCHANTABLITY OR NON-INFRINGEMENT.
- *
- * See the Apache Version 2.0 License for specific language governing
- * permissions and limitations under the License.
- */
 
 #include <gtest/gtest.h>
 
-//#include "firmament_scheduler_service_queue.h"
-#include "firmament_service_queue.h"
+#include "work_queue.h"
 
-namespace firmament {
-
-class FirmamentSchedulerServiceQueueTest : public ::testing::Test {
+class WorkQueueTest : public ::testing::Test {
 protected:
-  FirmamentSchedulerServiceQueueTest() {
+  WorkQueueTest() {
     // You can do initial set-up work for each test here.
   }
 
-  virtual ~FirmamentSchedulerServiceQueueTest() {
+  virtual ~WorkQueueTest() {
     // You can do clean-up work that doesn't throw exceptions here.
   }
 
@@ -47,8 +25,8 @@ protected:
 
 };
 
-TEST_F(FirmamentSchedulerServiceQueueTest, QueueTest) {
-  FirmamentSchedulerServiceQueue<string, string> test_queue;
+TEST_F(WorkQueueTest, QueueTest) {
+  WorkQueue<string, string> test_queue;
   test_queue.Add("10", "Value10");
   test_queue.Add("3", "Value3");
   test_queue.Add("2", "Value2");
@@ -70,7 +48,6 @@ TEST_F(FirmamentSchedulerServiceQueueTest, QueueTest) {
   test_queue.print_queue();
 }
 
-} // namespace firmament
 
 int main(int argc, char** argv) {
   ::testing::InitGoogleTest(&argc, argv);
