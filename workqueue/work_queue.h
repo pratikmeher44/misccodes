@@ -1,6 +1,11 @@
+#include <iostream>
 #include <unordered_map>
-//#include "misc/utils.h"
-// need to include the required headers
+#include <unordered_set>
+#include <boost/shared_ptr.hpp>
+#include <boost/thread/recursive_mutex.hpp>
+#include <boost/thread/condition_variable.hpp>
+
+using namespace std;
 
 template <class KeyType, class ItemsType>
 struct KeyItems {
@@ -103,21 +108,21 @@ bool ShuttingDown()
 }
 
 void print_queue() {
-  LOG(INFO) << "KEY QUEUE:";
+  cout << "KEY QUEUE:" << endl;
   for(auto it = key_queue.begin(); it != key_queue.end(); ++it) {
-    LOG(INFO) << "Key = " << *it;
+    cout << "Key = " << *it << endl;
   }
 
-  LOG(INFO) << "ITEMS QUEUE:";
+  cout << "ITEMS QUEUE:" << endl;
   for(auto it = items.begin(); it != items.end(); ++it) {
-    LOG(INFO) << it->first << " : " << it->second;
+    cout << it->first << " : " << it->second << endl;
   }
 
-  LOG(INFO) << "TOQUEUE:";
+  cout << "TOQUEUE:" << endl;
   for(auto it = toQueue.begin(); it != toQueue.end(); ++it) {
-    LOG(INFO) << it->first << ":" << it->second;
+    cout << it->first << ":" << it->second << endl;
   }
-  LOG(INFO) << "\n";
+  cout << endl;
 }
 
 private:

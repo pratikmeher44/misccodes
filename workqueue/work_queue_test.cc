@@ -1,6 +1,6 @@
 
-#include <gtest/gtest.h>
 
+#include <gtest/gtest.h>
 #include "work_queue.h"
 
 class WorkQueueTest : public ::testing::Test {
@@ -37,10 +37,10 @@ TEST_F(WorkQueueTest, QueueTest) {
   test_queue.Add("10", "Value101010");
   test_queue.print_queue();
   struct KeyItems<string, string> get_key_items = test_queue.Get();
-  LOG(INFO) << "key = " << get_key_items.key;
-  LOG(INFO) << "values: ";
+  cout << "key = " << get_key_items.key << endl;
+  cout << "values: " << endl;
   for(auto it = get_key_items.Items.begin(); it != get_key_items.Items.end(); ++it)
-    LOG(INFO) << *it << " ";
+    cout << *it << " " << endl;
   test_queue.print_queue();
   test_queue.Add("1", "Value111");
   test_queue.print_queue();
